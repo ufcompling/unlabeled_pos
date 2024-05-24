@@ -1,3 +1,5 @@
+# curl --remote-name-all https://lindat.mff.cuni.cz/repository/xmlui/bitstream/handle/11234/1-5502{/ud-treebanks-v2.14.tgz,/ud-documentation-v2.14.tgz,/ud-tools-v2.14.tgz}
+
 import io, os, sys
 import random
 
@@ -10,19 +12,24 @@ def conll_read_sentence(file_handle):
 		line = line.strip('\n')
 		if line.startswith('#') is False:
 			toks = line.split("\t")
-			if len(toks) != 10 and sent not in [[], ['']]:
+			if len(toks) != 10 and sent not in [[], ['']] and list(set([tok[1] for tok in sent])) != ['_']:
 				return sent 
 			if len(toks) == 10 and '-' not in toks[0] and '.' not in toks[0]:
 				if toks[0] == 'q1':
 					toks[0] = '1'
 				sent.append(toks)
 
+#	toks = [tok[1] for tok in sent]
+#	lemmas = [tok[2] for tok in sent]
+#	if (set(toks) == '_' and set(lemmas) == '_') or len(sent) == 0: ## filter out treebanks where the data is empty without needing special access
+#		return None
+
 	return None
 
 ## Collect data from the training or the test set
 def collect_data(file_handle):
 	data = []
-	with open(file) as f:
+	with open(file_handle) as f:
 		sent = conll_read_sentence(f)
 		while sent is not None:
 			words = [tok[1] for tok in sent]
@@ -60,7 +67,7 @@ def sort_train(train_data):
 		average_word_freq_info[idx] = average_word_freq
 
 	sorted_average_word_freq_info = sorted(average_word_freq_info.items(), key = lambda item: item[1])
-	sorted_train_data = [train_data[idx] for idx in sorted_average_word_freq_info]
+	sorted_train_data = [train_data[combo[0]] for combo in sorted_average_word_freq_info]
 
 	return sorted_train_data
 
@@ -81,6 +88,7 @@ def generate_initial_train_select(sorted_train_data, initial_size, treebank):
 		print('Check; Possibly not enough training data')
 		print(descriptive(sorted_train_data))
 		print('\n')
+		return None
 		
 	if i != 0:
 		select_set = sorted_train_data[i : ]
@@ -118,35 +126,44 @@ except:
 #exception_file = io.open('pos_exceptions.txt', 'w')
 
 initial_size = int(sys.argv[1])
-stats_file = io.open('pos_data/overall_stats.txt', 'w')
-header = ['treebank', 'train_n_sents', 'train_n_toks', 'dev_n_sents', 'dev_n_toks', 'test_n_sents', 'test_n_toks']
+#stats_file = io.open('pos_data/overall_stats.txt', 'w')
+#header = ['treebank', 'total_n_toks', 'train_n_toks', 'dev_n_toks', 'test_n_toks']
+#stats_file.write('\t'.join(w for w in header) + '\n')
 
-for treebank in os.listdir('ud-treebanks-v2.13/'):
+for treebank in os.listdir('ud-treebanks-v2.14/'):
 	train_file = ''
 	dev_file = ''
 	test_file = ''
-	for file in os.listdir('ud-treebanks-v2.13/' + treebank + '/'):
+	for file in os.listdir('ud-treebanks-v2.14/' + treebank + '/'):
 		if 'train.conllu' in file:
-			train_file = 'ud-treebanks-v2.13/' + treebank + '/' + file
+			train_file = 'ud-treebanks-v2.14/' + treebank + '/' + file
 		if 'dev.conllu' in file:
-			dev_file = 'ud-treebanks-v2.13/' + treebank + '/' + file
+			dev_file = 'ud-treebanks-v2.14/' + treebank + '/' + file
 		if 'test.conllu' in file:
-			test_file = 'ud-treebanks-v2.13/' + treebank + '/' + file
+			test_file = 'ud-treebanks-v2.14/' + treebank + '/' + file
 
-	if train_file != '' and test_file != '':
-
-		train_data = collect_data(train_file)
-		train_n_sents, train_n_toks = descriptive(train_data)
-		dev_data = ''
-		dev_n_sents = 0
-		dev_n_toks = 0
-		try:
-			dev_data = collect_data(dev_file)
-			dev_n_sents, dev_n_toks = descriptive(dev_data)
-		except:
-			pass
+	if train_file != '' and test_file != '' and treebank != 'UD_Latin-ITTB':
+#	if treebank == 'UD_English-GUMReddit':
 		test_data = collect_data(test_file)
-		test_n_sents, test_n_toks = descriptive(test_data)
+		if test_data == []:
+			print(treebank, 'EMPTY')
+			print('\n')
+		else:
+			test_n_sents, test_n_toks = descriptive(test_data)
+			train_data = collect_data(train_file)
+			train_n_sents, train_n_toks = descriptive(train_data)
+			dev_data = ''
+			dev_n_sents = 0
+			dev_n_toks = 0
+			try:
+				dev_data = collect_data(dev_file)
+				dev_n_sents, dev_n_toks = descriptive(dev_data)
+			except:
+				pass
+
+			total_n_toks = train_n_toks + dev_n_toks + test_n_toks
+
+#			stats_file.write('\t'.join(str(w) for w in [treebank, total_n_toks, train_n_toks, dev_n_toks, test_n_toks]) + '\n')
 
 		### UD Guidelines ###
 		# If you have less than 20K words:
@@ -156,16 +173,20 @@ for treebank in os.listdir('ud-treebanks-v2.13/'):
 		# If you have between 30K and 100K words, take 10K as test data, 10K as dev data and the rest as training data.
 		# If you have more than 100K words, take 80% as training data, 10% (min 10K words) as dev data and 10% (min 10K words) as test data.
 		
-		total_n_toks = train_n_toks + dev_n_toks + test_n_toks
-		if total_n_toks <= 30000: # 30K tokens
-			print(treebank)
+#		if test_n_toks >= 10000: # at least 10K tokens in the test set
+			print(treebank, total_n_toks, train_n_toks, dev_n_toks, test_n_toks)		
+					
 			os.system('mkdir pos_data/' + treebank)
-
 			sorted_train_data = sort_train(train_data)
-			actual_train_n_toks, actual_train_n_sents, actual_select_n_sents = generate_initial_train_select(sorted_train_data, initial_size, treebank):
-			print(actual_train_n_toks)
-			
-			generate_test(test_data, treebank)
 
-		print('')
+			try:
+				sorted_train_data = sort_train(train_data + dev_data)
+				actual_train_n_toks, actual_train_n_sents, actual_select_n_sents = generate_initial_train_select(sorted_train_data, initial_size, treebank)
+				print(actual_train_n_toks)
+			
+				generate_test(test_data, treebank)
+
+				print('')
+			except:
+				generate_initial_train_select(sorted_train_data, initial_size, treebank)
 
