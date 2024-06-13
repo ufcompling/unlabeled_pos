@@ -70,8 +70,9 @@ for seed in ['1', '2', '3']:
 		y_true = test_gold[i]
 		y_pred = test_predictions[i]
 	#	print(y_true, '\t', y_pred)
-	#	scores = precision_recall_fscore_support(y_true, y_pred, average='weighted')
-		precision, recall, f1 = metrics(y_true, y_pred)
+		scores = precision_recall_fscore_support(y_true, y_pred, average='weighted')
+	#	precision, recall, f1 = metrics(y_true, y_pred)
+		precision, recall, f1 = scores[0], scores[1], scores[2]
 		seed_precision_scores.append(precision)
 		seed_recall_scores.append(recall)
 		seed_f1_scores.append(f1)
@@ -96,3 +97,4 @@ evaluation_file.write('F1: ' + str(average_f1) + '\n')
 print('Precision: ' + str(average_precision) + '\n')
 print('Recall: ' + str(average_recall) + '\n')
 print('F1: ' + str(average_f1) + '\n')
+

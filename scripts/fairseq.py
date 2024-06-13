@@ -9,8 +9,8 @@ import torch
 
 def main(datadir, treebank, size, select_interval, select, arch, method):
 	# Determine the assigned GPU device dynamically
-    device_id = torch.cuda.current_device()  # Get the current GPU device
-    os.environ["CUDA_VISIBLE_DEVICES"] = str(device_id)  # Set the environment variable dynamically
+	device_id = torch.cuda.current_device()  # Get the current GPU device
+	os.environ["CUDA_VISIBLE_DEVICES"] = str(device_id)  # Set the environment variable dynamically
 
 	subprocess.run(['mkdir', '-p', datadir + treebank])
 	subprocess.run(['mkdir', '-p', datadir + treebank + '/' + size])
@@ -136,8 +136,7 @@ def main(datadir, treebank, size, select_interval, select, arch, method):
 					'--patience=10', # early stopping
 					'--skip-invalid-size-inputs-valid-test',
 					'--no-epoch-checkpoints',
-					'--no-last-checkpoints',
-					'--device-id', str(device_id)  # use --device-id to make sure all tensors are on the same device.
+					'--no-last-checkpoints'#,
 					]) 
 	
 		print("##################### TRAINED", size, "#####################")
@@ -149,9 +148,8 @@ def main(datadir, treebank, size, select_interval, select, arch, method):
 							  '--source-lang='+SRC,
 							  '--target-lang='+TGT,
 							  '--skip-invalid-size-inputs-valid-test',
-							  '--match-source-len',
+							  '--match-source-len'#,
 							#  '--cpu'
-							  '--device-id', str(device_id)
 							 ],
 						#	 shell=True,
 							 stdin=open(TESTIN),
@@ -177,8 +175,7 @@ def main(datadir, treebank, size, select_interval, select, arch, method):
 							  '--source-lang='+SRC,
 							  '--target-lang='+TGT,
 							  '--skip-invalid-size-inputs-valid-test',
-							  '--match-source-len',
-							  '--device-id', str(device_id)
+							  '--match-source-len'#,
 						#	  '--cpu'
 							 ],
 						#	 shell=True,
@@ -230,7 +227,7 @@ def main(datadir, treebank, size, select_interval, select, arch, method):
 			confidence_dict[k] = statistics.mean(v)
 	
 		sorted_confidence_dict = sorted(confidence_dict.items(), key = lambda item: item[1])
-		increment_sents = sorted_confidence_dict[ : int(select_interval)]
+		increment_sents = [] #sorted_confidence_dict[ : int(select_interval)]
 		n_toks = 0
 		i = 0
 		while n_toks <= int(select_interval):
@@ -315,3 +312,4 @@ if __name__== '__main__':
 	else:
 		main(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
 		print('\n########### FINISHED ', sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], ' ###########\n')
+

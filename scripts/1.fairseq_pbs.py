@@ -13,8 +13,7 @@ second_string = '''#SBATCH --mail-type=END,FAIL          # Mail events (NONE, BE
 pwd; hostname; date
 
 module load conda
-mamba activate data_partition
-module load fairseq
+mamba activate fairseq-env
 
 cd /blue/liu.ying/unlabeled_pos/
 
@@ -54,39 +53,36 @@ for treebank in treebanks_select:
 								f.write('python scripts/fairseq.py /blue/liu.ying/unlabeled_pos/' + task + '_data/ ' + treebank + ' ' + size + ' ' + select_interval + ' ' + select + ' ' + arch + ' ' + method + '\n')
 								f.write('\n')
 			
-								f.write('module unload fairseq' + '\n')
 								f.write('module load python3' + '\n')
 								f.write('\n')
 								f.write('python scripts/eval.py /blue/liu.ying/unlabeled_pos/' + task + '_data/ ' + treebank + ' ' + size + ' ' + select_interval + ' ' + select + ' ' + arch + ' ' + method + '\n')
 								f.write('\n')
 								f.write('module load conda' + '\n')
-								f.write('mamba activate data_partition' + '\n')
-								f.write('module load fairseq' + '\n')
+								f.write('mamba activate fairseq-env' + '\n')
 								f.write('\n')
 			
 						f.write('date' + '\n')
 						f.write('\n')
 
-			# Only need to run one of these pbs files since the total amount of data available is the same
-			select = 'all'
-			for arch in ['transformer']: #, 'transformer_tiny', 'lstm']:
-				with open('pbs/' + treebank + size + '_select' + select + '_' + arch +'.pbs', 'w') as f:
-					first_string = '''#!/bin/bash\n#SBATCH --job-name=''' + treebank + '_' + size + '_' + select + '_' + arch + '    # Job name'
+		# Only need to run one of these pbs files since the total amount of data available is the same
+		select = 'all'
+		for arch in ['transformer']: #, 'transformer_tiny', 'lstm']:
+			with open('pbs/' + treebank + size + '_select' + select + '_' + arch +'.pbs', 'w') as f:
+				first_string = '''#!/bin/bash\n#SBATCH --job-name=''' + treebank + '_' + size + '_' + select + '_' + arch + '    # Job name'
 
-					f.write(first_string + '\n')
-					f.write(second_string + '\n')
+				f.write(first_string + '\n')
+				f.write(second_string + '\n')
 
-					f.write('python scripts/fairseq.py /blue/liu.ying/unlabeled_pos/' + task + '_data/ ' + treebank + ' ' + size + ' ' + select_interval + ' ' + select + ' ' + arch + ' al' + '\n')
-					f.write('\n')
+				f.write('python scripts/fairseq.py /blue/liu.ying/unlabeled_pos/' + task + '_data/ ' + treebank + ' ' + size + ' ' + select_interval + ' ' + select + ' ' + arch + ' al' + '\n')
+				f.write('\n')
 			
-					f.write('module unload fairseq' + '\n')
-					f.write('module load python3' + '\n')
-					f.write('\n')
-					f.write('python scripts/eval.py /blue/liu.ying/unlabeled_pos/' + task + '_data/ ' + treebank + ' ' + size + ' ' + select_interval + ' ' + select + ' ' + arch + ' al' + '\n')
-					f.write('\n')
+				f.write('module load python3' + '\n')
+				f.write('\n')
+				f.write('python scripts/eval.py /blue/liu.ying/unlabeled_pos/' + task + '_data/ ' + treebank + ' ' + size + ' ' + select_interval + ' ' + select + ' ' + arch + ' al' + '\n')
+				f.write('\n')
 			
-					f.write('date' + '\n')
-					f.write('\n')
+				f.write('date' + '\n')
+				f.write('\n')
 
 '''
 ### Combine pbs file for each language, given a start size, a select interval, and a select size
