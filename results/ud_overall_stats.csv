@@ -1,0 +1,164 @@
+﻿treebank,total_n_toks,train_n_toks,dev_n_toks,test_n_toks,Exclude,Reason,Language Family,Population,Language Vitality,Select?
+UD_Bororo-BDT,6993,0,0,6993,?,not enough tokens in total,Bororan,less than 10K,Endangered,
+UD_Cappadocian-TueCL,3977,0,0,3977,?,not enough tokens in total,IE,less than 10K,Endangered,
+UD_Irish-IDT,115990,95881,10000,10109,,,IE,1M to 1B,Endangered,yes
+UD_Irish-TwittIrish,47790,15777,16580,15433,,,IE,1M to 1B,Endangered,yes
+UD_Komi_Permyak-UH,1003,248,0,755,yes,not enough tokens in the training set,Uralic,10K to 1M,Endangered,
+UD_Komi_Zyrian-Lattice,8083,158,0,7925,?,not enough tokens in the training set,Uralic,10K to 1M,Endangered,
+UD_Latin-ITTB,450517,390787,29888,29842,,,IE,None,Endangered,yes
+UD_Latin-LLCT,242411,194143,24189,24079,,,IE,None,Endangered,yes
+UD_Latin-Perseus,29221,18259,0,10962,,,IE,None,Endangered,yes
+UD_Latin-PROIEL,205566,177558,13917,14091,,,IE,None,Endangered,yes
+UD_Latin-UDante,55519,30450,11617,13452,,,IE,None,Endangered,yes
+UD_Livvi-KKPP,1632,144,0,1488,yes,not enough tokens in the training set,Uralic,10K to 1M,Endangered,
+UD_Manx-Cadhan,20725,10378,0,10347,,,IE,less than 10K,Endangered,yes
+UD_Moksha-JR,4131,150,0,3981,?,not enough tokens in the training set,Uralic,10K to 1M,Endangered,
+UD_Nheengatu-CompLin,14874,0,0,14874,?,not enough tokens in the training set,Tupian,10K to 1M,Endangered,
+UD_Romanian-Nonstandard,572436,532881,18569,20986,,,IE,less than 10K,Endangered,yes
+UD_Romanian-RRT,218522,185125,17073,16324,,,IE,less than 10K,Endangered,yes
+UD_Romanian-SiMoNERo,146020,116857,14611,14552,,,IE,less than 10K,Endangered,yes
+UD_Sanskrit-Vedic,27117,17445,0,9672,yes,not contemporary language,IE,10K to 1M,Endangered,
+UD_Skolt_Sami-Giellagas,2902,153,0,2749,?,not enough tokens in the training set,Uralic,less than 10K,Endangered,
+UD_Upper_Sorbian-UFAL,11196,460,0,10736,?,not enough tokens in the training set,IE,10K to 1M,Endangered,
+UD_Afrikaans-AfriBooms,49260,33880,5317,10063,,,IE,1M to 1B,institutional,yes
+UD_Ancient_Greek-Perseus,202989,159895,22135,20959,yes,not contemporary language,,,institutional,
+UD_Arabic-NYUAD,738889,590819,73945,74125,yes,data is empty,Afro-Asiatic,1M to 1B,institutional,
+UD_Arabic-PADT,282384,223881,30239,28264,,,Afro-Asiatic,1M to 1B,institutional,yes
+UD_Armenian-ArmTDP,52585,42069,5359,5157,,,IE,1M to 1B,institutional,yes
+UD_Armenian-BSUT,41805,21246,10312,10247,,,IE,1M to 1B,institutional,yes
+UD_Basque-BDT,121443,72974,24095,24374,,,Isolate,1M to 1B,institutional,yes
+UD_Belarusian-HSE,305109,273181,15931,15997,,,IE,1M to 1B,institutional,yes
+UD_Beja-NSC,5888,0,0,5888,?,not enough tokens in total,IE,1M to 1B,institutional,
+UD_Bulgarian-BTB,156149,124336,16089,15724,,,IE,1M to 1B,institutional,yes
+UD_Catalan-AnCora,547261,429578,58073,59610,,,IE,1M to 1B,institutional,yes
+UD_Chinese-GSD,123291,98616,12663,12012,yes,,Sino-Tibetan,more than 1B,institutional,
+UD_Chinese-GSDSimp,123291,98616,12663,12012,,,Sino-Tibetan,more than 1B,institutional,yes
+UD_Croatian-SET,199409,152857,22292,24260,,,IE,1M to 1B,institutional,yes
+UD_Czech-CAC,494383,472609,10912,10862,,,IE,1M to 1B,institutional,yes
+UD_Czech-CLTT,36013,13894,10710,11409,,,IE,1M to 1B,institutional,yes
+UD_Czech-FicTree,167056,133637,16714,16705,,,IE,1M to 1B,institutional,yes
+UD_Czech-PDT,1506486,1173285,159283,173918,,,IE,1M to 1B,institutional,yes
+UD_Danish-DDT,100733,80378,10332,10023,,,IE,1M to 1B,institutional,yes
+UD_Dutch-Alpino,208614,186027,11541,11046,,,IE,1M to 1B,institutional,yes
+UD_Dutch-LassySmall,297065,239941,28129,28995,,,IE,1M to 1B,institutional,yes
+UD_English-Atis,61879,48655,6644,6580,,,IE,1M to 1B,institutional,yes
+UD_English-CTeTex,9273,0,0,9273,?,not enough tokens in the training set,IE,1M to 1B,institutional,
+UD_English-ESLSpok,21312,16879,2167,2266,,,IE,1M to 1B,institutional,yes
+UD_English-EWT,254820,204577,25149,25094,,,IE,1M to 1B,institutional,yes
+UD_English-GUM,208332,161210,23455,23667,,,IE,1M to 1B,institutional,yes
+UD_English-GUMReddit,16364,12751,1755,1858,yes,need special data access,IE,1M to 1B,institutional,
+UD_English-LinES,94217,57372,19170,17675,,,IE,1M to 1B,institutional,yes
+UD_English-ParTUT,49633,43503,2722,3408,,,IE,1M to 1B,institutional,yes
+UD_Estonian-EDT,437826,344589,44748,48489,,,Uralic,1M to 1B,institutional,yes
+UD_Estonian-EWT,90585,67431,10002,13152,,,Uralic,1M to 1B,institutional,yes
+UD_Faroese-FarPaHC,40484,23094,8746,8644,,,IE,10K to 1M,institutional,yes
+UD_Finnish-FTB,159612,127602,15724,16286,,,Uralic,1M to 1B,institutional,yes
+UD_Finnish-TDT,202192,162814,18308,21070,,,Uralic,1M to 1B,institutional,yes
+UD_French-GSD,400305,354583,35707,10015,,,IE,1M to 1B,institutional,yes
+UD_French-ParisStories,42795,22244,10275,10276,,,IE,1M to 1B,institutional,yes
+UD_French-ParTUT,28576,24103,1870,2603,,,IE,1M to 1B,institutional,yes
+UD_French-Rhapsodie,44242,19144,12907,12191,,,IE,1M to 1B,institutional,yes
+UD_French-Sequoia,70546,50503,9999,10044,,,IE,1M to 1B,institutional,yes
+UD_Galician-CTG,138837,79327,29772,29738,,,IE,1M to 1B,institutional,yes
+UD_Galician-PUD,21836,0,0,21836,?,not enough tokens in the training set,IE,1M to 1B,institutional,
+UD_Galician-TreeGal,25548,15436,0,10112,,,IE,1M to 1B,institutional,yes
+UD_German-GSD,292769,263791,12480,16498,,,IE,1M to 1B,institutional,yes
+UD_German-HDT,3455580,2799069,324848,331663,,,IE,1M to 1B,institutional,yes
+UD_Greek-GDT,63441,42326,10443,10672,,,IE,1M to 1B,institutional,yes
+UD_Greek-GUD,25493,14860,0,10633,,,IE,1M to 1B,institutional,yes
+UD_Hausa-SouthernAutogramm,14585,0,0,14585,?,not enough tokens in the training set,Afro-Asiatic,1M to 1B,institutional,
+UD_Hebrew-HTB,160195,136501,11412,12282,,,Afro-Asiatic,1M to 1B,institutional,yes
+UD_Hebrew-IAHLTwiki,140950,120824,9395,10731,,,Afro-Asiatic,1M to 1B,institutional,yes
+UD_Hindi-HDTB,351704,281057,35217,35430,,,IE,1M to 1B,institutional,yes
+UD_Hungarian-Szeged,42032,20166,11418,10448,,,Uralic,1M to 1B,institutional,yes
+UD_Icelandic-GC,99611,78568,10694,10349,,,IE,10K to 1M,institutional,yes
+UD_Icelandic-IcePaHC,985049,705748,139605,139696,,,IE,10K to 1M,institutional,yes
+UD_Icelandic-Modern,80395,61817,8431,10147,,,IE,10K to 1M,institutional,yes
+UD_Indonesian-CSUI,28263,18222,0,10041,,,Austronesian,1M to 1B,institutional,yes
+UD_Indonesian-GSD,122019,97602,12661,11756,,,Austronesian,1M to 1B,institutional,yes
+UD_Italian-ISDT,298337,276013,11907,10417,,,IE,1M to 1B,institutional,yes
+UD_Italian-MarkIT,40488,19893,10399,10196,,,IE,1M to 1B,institutional,yes
+UD_Italian-Old,41367,21156,10060,10151,yes,,IE,1M to 1B,institutional,
+UD_Italian-ParlaMint,20460,10026,0,10434,,,IE,1M to 1B,institutional,yes
+UD_Italian-ParTUT,55558,48934,2984,3640,,,IE,1M to 1B,institutional,yes
+UD_Italian-PoSTWITA,124515,99531,12308,12676,,,IE,1M to 1B,institutional,yes
+UD_Italian-TWITTIRO,29602,23631,2995,2976,,,IE,1M to 1B,institutional,yes
+UD_Italian-VIT,280145,225279,28530,26336,,,IE,1M to 1B,institutional,yes
+UD_Japanese-BCCWJ,1253903,908738,178306,166859,yes,empty words,Japonic,1M to 1B,institutional,
+UD_Japanese-BCCWJLUW,995632,715759,145398,134475,yes,empty words,Japonic,1M to 1B,institutional,
+UD_Japanese-GSD,193654,168333,12287,13034,,,Japonic,1M to 1B,institutional,yes
+UD_Japanese-GSDLUW,150243,130284,9531,10428,,,Japonic,1M to 1B,institutional,yes
+UD_Kazakh-KTB,10536,529,0,10007,?,not enough tokens in the training set,Turkic,1M to 1B,institutional,
+UD_Korean-GSD,80322,56687,11958,11677,,,Koreanic,1M to 1B,institutional,yes
+UD_Korean-Kaist,350090,296446,25278,28366,,,Koreanic,1M to 1B,institutional,yes
+UD_Kurmanji-MG,10260,242,0,10018,?,not enough tokens in the training set,IE,1M to 1B,institutional,
+UD_Kyrgyz-KTMU,7451,694,0,6757,?,not enough tokens in the training set,Turkic,1M to 1B,institutional,
+UD_Latvian-LVTB,309419,237747,34348,37324,,,IE,1M to 1B,institutional,yes
+UD_Ligurian-GLT,6928,226,0,6702,?,not enough tokens in the training set,IE,1M to 1B,institutional,
+UD_Lithuanian-ALKSNIS,70047,47641,11560,10846,,,IE,1M to 1B,institutional,yes
+UD_Lithuanian-HSE,5356,3210,1086,1060,,,IE,1M to 1B,institutional,yes
+UD_Low_Saxon-LSDC,22615,11666,0,10949,,,IE,1M to 1B,institutional,yes
+UD_Maghrebi_Arabic_French-Arabizi,19793,15404,2210,2179,,,Afro-Asiatic,1M to 1B,institutional,yes
+UD_Maltese-MUDT,44162,22880,10209,11073,,,Afro-Asiatic,10K to 1M,institutional,yes
+UD_Marathi-UFAL,3847,2997,438,412,?,not enough tokens in total,IE,1M to 1B,institutional,
+UD_Naija-NSC,140818,111897,14571,14350,,,English-based creole,1M to 1B,institutional,yes
+UD_North_Sami-Giella,26845,16835,0,10010,,,Uralic,10K to 1M,institutional,yes
+UD_Norwegian-Bokmaal,310221,243886,36369,29966,,,IE,1M to 1B,institutional,yes
+UD_Norwegian-Nynorsk,301353,245330,31250,24773,,,IE,1M to 1B,institutional,yes
+UD_Persian-PerDT,501776,452496,25147,24133,,,IE,1M to 1B,institutional,yes
+UD_Persian-Seraji,152920,121064,15832,16024,,,IE,1M to 1B,institutional,yes
+UD_Polish-LFG,130967,104750,13105,13112,,,IE,1M to 1B,institutional,yes
+UD_Polish-PDB,349978,281685,34677,33616,,,IE,1M to 1B,institutional,yes
+UD_Pomak-Philotis,86780,69223,8753,8804,,,IE,1M to 1B,institutional,yes
+UD_Portuguese-Bosque,227827,171776,28447,27604,,,IE,1M to 1B,institutional,yes
+UD_Portuguese-CINTIL,475860,346576,46986,82298,,,IE,1M to 1B,institutional,yes
+UD_Portuguese-GSD,318666,255116,32073,31477,,,IE,1M to 1B,institutional,yes
+UD_Portuguese-PetroGold,250605,198771,22211,29623,,,IE,1M to 1B,institutional,yes
+UD_Portuguese-Porttinari,168080,117972,16528,33580,,,IE,1M to 1B,institutional,yes
+UD_Russian-GSD,97994,74900,11709,11385,,,IE,1M to 1B,institutional,yes
+UD_Russian-Poetry,64112,43972,10102,10038,,,IE,1M to 1B,institutional,yes
+UD_Russian-SynTagRus,1515683,1204640,153325,157718,,,IE,1M to 1B,institutional,yes
+UD_Russian-Taiga,197001,176631,10096,10274,,,IE,1M to 1B,institutional,yes
+UD_Scottish_Gaelic-ARCOSG,89958,68775,10643,10540,,,IE,1M to 1B,institutional,yes
+UD_Serbian-SET,97673,74259,11993,11421,,,IE,1M to 1B,institutional,yes
+UD_Slovak-SNK,106097,80628,12733,12736,,,IE,1M to 1B,institutional,yes
+UD_Slovenian-SSJ,267097,215155,26500,25442,,,IE,1M to 1B,institutional,yes
+UD_Slovenian-SST,76341,55939,10322,10080,,,IE,1M to 1B,institutional,yes
+UD_Spanish-AnCora,560137,453039,53476,53622,,,IE,1M to 1B,institutional,yes
+UD_Spanish-GSD,431586,382435,37151,12000,,,IE,1M to 1B,institutional,yes
+UD_Swedish-LinES,90960,55451,18515,16994,,,IE,1M to 1B,institutional,yes
+UD_Swedish-Talbanken,96820,66646,9797,20377,,,IE,1M to 1B,institutional,yes
+UD_Tamil-TTB,9581,6329,1263,1989,,,Dravidian,1M to 1B,institutional,yes
+UD_Telugu-MTG,6465,5082,662,721,,,Dravidian,1M to 1B,institutional,yes
+UD_Turkish-Atis,45907,36230,4862,4815,,,Turkic,1M to 1B,institutional,yes
+UD_Turkish-BOUN,125212,100713,12289,12210,,,Turkic,1M to 1B,institutional,yes
+UD_Turkish-FrameNet,19223,16335,1421,1467,,,Turkic,1M to 1B,institutional,yes
+UD_Turkish-IMST,58096,37522,10542,10032,,,Turkic,1M to 1B,institutional,yes
+UD_Turkish-Kenet,178658,143287,17554,17817,,,Turkic,1M to 1B,institutional,yes
+UD_Turkish-Penn,183555,166514,6994,10047,,,Turkic,1M to 1B,institutional,yes
+UD_Turkish-Tourism,91152,70877,10169,10106,,,Turkic,1M to 1B,institutional,yes
+UD_Ukrainian-IU,122750,92927,12606,17217,,,IE,1M to 1B,institutional,yes
+UD_Urdu-UDTB,138077,108690,14581,14806,,,IE,1M to 1B,institutional,yes
+UD_Uyghur-UDT,40236,19262,10644,10330,,,Turkic,1M to 1B,institutional,yes
+UD_Vietnamese-VTB,58069,20215,26162,11692,,,IE,1M to 1B,institutional,yes
+UD_Welsh-CCG,48530,22381,9123,17026,,,IE,10K to 1M,institutional,yes
+UD_Wolof-WTB,44258,23561,10294,10403,,,Niger-Congo,1M to 1B,institutional,yes
+UD_Bavarian-MaiBaam,14680,0,0,14680,?,not enough tokens in total,IE,1M to 1B,Stable,
+UD_Erzya-JR,20705,10294,0,10411,,,Uralic,10K to 1M,Stable,yes
+UD_Western_Armenian-ArmTDP,122907,95921,13438,13548,,,IE,1M to 1B,Stable,yes
+UD_Zaar-Autogramm,16396,0,0,16396,?,not enough tokens in the training set,Afro-Asiatic,10K to 1M,Stable,
+UD_Ancient_Greek-PROIEL,214005,187039,13652,13314,yes,not contemporary language,,,,
+UD_Ancient_Greek-PTNK,39509,18440,10723,10346,yes,not contemporary language,,,,
+UD_Ancient_Hebrew-PTNK,39036,18278,10531,10227,yes,not contemporary language,,,,
+UD_Buryat-BDT,10185,153,0,10032,?,not enough tokens in the training set,Mongolic,10K to 1M,,
+UD_Classical_Chinese-Kyoto,433168,374559,31043,27566,yes,not contemporary language,,,,
+UD_Coptic-Scriptorium,57096,35764,10960,10372,yes,not contemporary language,,,,
+UD_Gothic-PROIEL,55336,35024,10114,10198,?,not contemporary language,,,,
+UD_Latin-CIRCSE,18453,0,0,18453,?,not enough tokens in the training set,,,,
+UD_Old_Church_Slavonic-PROIEL,198843,159710,18984,20149,yes,not contemporary language,,,,
+UD_Old_East_Slavic-Birchbark,27269,7256,10009,10004,yes,not contemporary language,,,,
+UD_Old_East_Slavic-RNC,48647,17508,10262,20877,yes,not contemporary language,,,,
+UD_Old_East_Slavic-Ruthenian,96803,80769,6023,10011,yes,not contemporary language,,,,
+UD_Old_East_Slavic-TOROT,246850,191350,27622,27878,yes,not contemporary language,,,,
+UD_Old_French-PROFITEROLE,227137,179890,23728,23519,yes,not contemporary language,,,,
+UD_Turkish_German-SAGT,37227,10081,13057,14089,,,,,,yes

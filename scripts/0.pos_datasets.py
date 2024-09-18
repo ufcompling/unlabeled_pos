@@ -29,12 +29,15 @@ def conll_read_sentence(file_handle):
 ## Collect data from the training or the test set
 def collect_data(file_handle):
 	data = []
-	with open(file_handle) as f:
+	with open(file_handle, encoding = 'utf-8') as f:
 		sent = conll_read_sentence(f)
 		while sent is not None:
 			words = [tok[1] for tok in sent]
 			POS_tags = [tok[3] for tok in sent]
-			data.append([words, POS_tags])
+			if len(words) == 1 and POS_tags[0] == 'PUNCT':
+				pass
+			else:
+				data.append([words, POS_tags])
 			sent = conll_read_sentence(f)
 
 	return data
@@ -79,7 +82,7 @@ def generate_initial_train_select(sorted_train_data, initial_size, treebank):
 	n_toks = 0 # actual initial training size, measured as the number of tokens
 	i = 0
 	try:
-		while n_toks <= initial_size:
+		while n_toks < initial_size:
 			pair = sorted_train_data[i]
 			train_set.append(pair)
 			n_toks += len(pair[0])
@@ -142,7 +145,7 @@ for treebank in os.listdir('ud-treebanks-v2.14/'):
 		if 'test.conllu' in file:
 			test_file = 'ud-treebanks-v2.14/' + treebank + '/' + file
 
-	if train_file != '' and test_file != '' and treebank != 'UD_Latin-ITTB':
+	if train_file != '' and test_file != '':
 #	if treebank == 'UD_English-GUMReddit':
 		test_data = collect_data(test_file)
 		if test_data == []:
@@ -173,20 +176,27 @@ for treebank in os.listdir('ud-treebanks-v2.14/'):
 		# If you have between 30K and 100K words, take 10K as test data, 10K as dev data and the rest as training data.
 		# If you have more than 100K words, take 80% as training data, 10% (min 10K words) as dev data and 10% (min 10K words) as test data.
 		
-#		if test_n_toks >= 10000: # at least 10K tokens in the test set
-			print(treebank, total_n_toks, train_n_toks, dev_n_toks, test_n_toks)		
+#		if test_n_toks >= 10000: # at least 10K tokens in the test set		
 					
 			os.system('mkdir pos_data/' + treebank)
-			sorted_train_data = sort_train(train_data)
-
+			sorted_train_data = sort_train(train_data) ### only using the training set (better justified?)
 			try:
-				sorted_train_data = sort_train(train_data + dev_data)
 				actual_train_n_toks, actual_train_n_sents, actual_select_n_sents = generate_initial_train_select(sorted_train_data, initial_size, treebank)
-				print(actual_train_n_toks)
-			
-				generate_test(test_data, treebank)
-
-				print('')
 			except:
-				generate_initial_train_select(sorted_train_data, initial_size, treebank)
+				print(treebank, total_n_toks, train_n_toks, dev_n_toks, test_n_toks)
+
+			generate_test(test_data, treebank)
+
+			print('')
+
+#			try:
+#				sorted_train_data = sort_train(train_data + dev_data)
+#				actual_train_n_toks, actual_train_n_sents, actual_select_n_sents = generate_initial_train_select(sorted_train_data, initial_size, treebank)
+#				print(actual_train_n_toks)
+			
+#				generate_test(test_data, treebank)
+
+#				print('')
+#			except:
+#				generate_initial_train_select(sorted_train_data, initial_size, treebank)
 

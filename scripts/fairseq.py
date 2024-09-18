@@ -12,7 +12,6 @@ def main(datadir, treebank, size, select_interval, select, arch, method):
 	device_id = torch.cuda.current_device()  # Get the current GPU device
 	os.environ["CUDA_VISIBLE_DEVICES"] = str(device_id)  # Set the environment variable dynamically
 
-	subprocess.run(['mkdir', '-p', datadir + treebank])
 	subprocess.run(['mkdir', '-p', datadir + treebank + '/' + size])
 	subprocess.run(['mkdir', '-p', datadir + treebank + '/' + size + '/' + method])
 	subprocess.run(['mkdir', '-p', datadir + treebank + '/' + size + '/' + method + '/' + select_interval])
@@ -25,20 +24,20 @@ def main(datadir, treebank, size, select_interval, select, arch, method):
 		previous_datadir = datadir + treebank + '/' + size + '/' + method + '/' + select_interval + '/select' + str(int(select) - int(select_interval)) + '/'
 
 	if select == '0':
-		os.system('cp ' + datadir + treebank + '/train.' + size + '.input ' + sub_datadir)
-		os.system('cp ' + datadir + treebank + '/train.' + size + '.output ' + sub_datadir)
-		os.system('cp ' + datadir + treebank + '/select.' + size + '.input ' + sub_datadir)
-		os.system('cp ' + datadir + treebank + '/select.' + size + '.output ' + sub_datadir)
+		os.system('cp ' + datadir + treebank + '/train.' + size + '.input ' + sub_datadir + arch + '_train.' + size + '.input')
+		os.system('cp ' + datadir + treebank + '/train.' + size + '.output ' + sub_datadir + arch + '_train.' + size + '.output')
+		os.system('cp ' + datadir + treebank + '/select.' + size + '.input ' + sub_datadir + arch + '_select.' + size + '.input')
+		os.system('cp ' + datadir + treebank + '/select.' + size + '.output ' + sub_datadir + arch + '_select.' + size + '.output')
 
 	elif select == 'all':
-		os.system('cat ' + datadir + treebank + '/train.' + size + '.input ' + datadir + treebank + '/select.' + size + '.input >' + sub_datadir + 'train.' + size + '.input')
-		os.system('cat ' + datadir + treebank + '/train.' + size + '.input ' + datadir + treebank + '/select.' + size + '.output >' + sub_datadir + 'train.' + size + '.output')
+		os.system('cat ' + datadir + treebank + '/train.' + size + '.input ' + datadir + treebank + '/select.' + size + '.input >' + sub_datadir + arch + '_train.' + size + '.input')
+		os.system('cat ' + datadir + treebank + '/train.' + size + '.output ' + datadir + treebank + '/select.' + size + '.output >' + sub_datadir + arch + '_train.' + size + '.output')
 
 	else:
-		os.system('cat ' + previous_datadir + 'train.' + size + '.input ' + previous_datadir + '/increment.input >' + sub_datadir + 'train.' + size + '.input')
-		os.system('cat ' + previous_datadir + 'train.' + size + '.output ' + previous_datadir + '/increment.output >' + sub_datadir + 'train.' + size + '.output')
-		os.system('mv ' + previous_datadir + 'residual.input ' + sub_datadir + 'select.' + size + '.input')
-		os.system('mv ' + previous_datadir + 'residual.output ' + sub_datadir + 'select.' + size + '.output')
+		os.system('cat ' + previous_datadir + arch + '_train.' + size + '.input ' + previous_datadir + '/' + arch + '_increment.input >' + sub_datadir + arch + '_train.' + size + '.input')
+		os.system('cat ' + previous_datadir + arch + '_train.' + size + '.output ' + previous_datadir + '/' + arch + '_increment.output >' + sub_datadir + arch + '_train.' + size + '.output')
+		os.system('mv ' + previous_datadir + arch + '_residual.input ' + sub_datadir + arch + '_select.' + size + '.input')
+		os.system('mv ' + previous_datadir + arch + '_residual.output ' + sub_datadir + arch + '_select.' + size + '.output')
 
 #	lang = treebank.split('-')[0].split('_')[1]
 #	SRC = lang + '_' + size + '.input'
@@ -46,24 +45,24 @@ def main(datadir, treebank, size, select_interval, select, arch, method):
 	SRC = size + '.input'
 	TGT = size + '.output'
 	TESTIN = datadir + treebank + '/test.full.input'
-	TO_PREDICT = sub_datadir + 'select.'+ size + '.input'
+	TO_PREDICT = sub_datadir + arch + '_select.'+ size + '.input'
 
 	### Collecting the pool of words to select from
-	select_input = []
-	select_output = []
-	select_combo = []
-	with open(sub_datadir + '/select.'+ size + '.input') as f:
-		for line in f:
-			toks = line.strip()
-			select_input.append(toks)
+	if select != 'all':
+		select_input = []
+		select_output = []
+		select_combo = []
+		with open(sub_datadir + arch + '_select.'+ size + '.input') as f:
+			for line in f:
+				toks = line.strip()
+				select_input.append(toks)
 
-	
-	with open(sub_datadir + '/select.'+ size + '.output') as f:
-		for line in f:
-			toks = line.strip()
-			select_output.append(toks)
+		with open(sub_datadir + arch + '_select.'+ size + '.output') as f:
+			for line in f:
+				toks = line.strip()
+				select_output.append(toks)
 
-	select_combo = [select_input[i] + '_' + select_output[i] for i in range(len(select_input))]
+		select_combo = [select_input[i] + '_' + select_output[i] for i in range(len(select_input))]
 
 	confidence_dict = {}
 
@@ -249,8 +248,8 @@ def main(datadir, treebank, size, select_interval, select, arch, method):
 		for combo in sorted_confidence_dict[i : i + 5]:
 			print(combo[0], confidence_dict[combo[0]])
 
-		increment_input = open(sub_datadir + 'increment.input', 'w')
-		increment_output = open(sub_datadir + 'increment.output', 'w')
+		increment_input = open(sub_datadir + arch + '_increment.input', 'w')
+		increment_output = open(sub_datadir + arch + '_increment.output', 'w')
 		increment_pairs = []
 		for combo in increment_sents:
 			pair = combo[0]
@@ -261,8 +260,8 @@ def main(datadir, treebank, size, select_interval, select, arch, method):
 
 		print('')
 		print('Start writing residual output' + '\n')
-		residual_input = open(sub_datadir + 'residual.input', 'w')
-		residual_output = open(sub_datadir + 'residual.output', 'w')
+		residual_input = open(sub_datadir + arch + '_residual.input', 'w')
+		residual_output = open(sub_datadir + arch + '_residual.output', 'w')
 		for pair in select_combo:
 			if pair not in increment_pairs:
 				pair = pair.split('_')
@@ -270,8 +269,8 @@ def main(datadir, treebank, size, select_interval, select, arch, method):
 				residual_output.write(pair[1] + '\n')
 
 	if method == 'tokenfreq':
-		increment_input = open(sub_datadir + 'increment.input', 'w')
-		increment_output = open(sub_datadir + 'increment.output', 'w')
+		increment_input = open(sub_datadir + arch + '_increment.input', 'w')
+		increment_output = open(sub_datadir + arch + '_increment.output', 'w')
 
 		n_toks = 0
 		i = 0
@@ -284,8 +283,8 @@ def main(datadir, treebank, size, select_interval, select, arch, method):
 			increment_output.write(pair[1] + '\n')
 			i += 1 
 
-		residual_input = open(sub_datadir + 'residual.input', 'w')
-		residual_output = open(sub_datadir + 'residual.output', 'w')
+		residual_input = open(sub_datadir + arch + '_residual.input', 'w')
+		residual_output = open(sub_datadir + arch + '_residual.output', 'w')
 		residual_start_idx = i
 		for i in range(len(select_combo[residual_start_idx : ])):
 			combo = select_combo[i]
@@ -294,15 +293,7 @@ def main(datadir, treebank, size, select_interval, select, arch, method):
 			residual_output.write(pair[1] + '\n')
 
 
-#	for seed in ['1', '2', '3']:
-#		to_zip = datadir + size + '/select' + select + '/' + arch + '/' + seed + '/checkpoints'
-#		os.system('zip -r ' + to_zip + '.zip ' + to_zip)
-#		os.system('rm -r ' + to_zip)
-
-
 if __name__== '__main__':
-	'''Command: python pathtothisfile pathtodatadir iteration/experiment
-	e.g. python scripts/fq_transformer_wu.py /blue/liu.ying/al_morphseg/al_pilot_data/ lez50 transformer'''
 
 	metrics = {}
 	evaluation_file = sys.argv[1] + sys.argv[2] + '/' + sys.argv[3] + '/' + sys.argv[7] + '/' + sys.argv[4] + '/select' + sys.argv[5] + '/' + sys.argv[6] + '/eval.txt'

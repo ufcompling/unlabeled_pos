@@ -5,7 +5,7 @@ second_string = '''#SBATCH --mail-type=END,FAIL          # Mail events (NONE, BE
 #SBATCH --ntasks=1                    # Run on a single CPU
 #SBATCH --cpus-per-task=1                    
 #SBATCH --mem=8gb                     # Job memory request
-#SBATCH --time=48:00:00               # Time limit hrs:min:sec
+#SBATCH --time=120:00:00               # Time limit hrs:min:sec
 #SBATCH --output=serial_test_%j.log   # Standard output and error log
 #SBATCH --partition=gpu
 #SBATCH --gpus=a100:1
@@ -28,17 +28,16 @@ if not os.path.exists('pbs/'):
 sizes = ['500']
 
 task = 'pos'
-max_size = 20000
+max_size = 100000
 
 treebanks_select = [sys.argv[1]]
-
 
 for treebank in treebanks_select:
 #for treebank in os.listdir('/blue/liu.ying/unlabeled_pos/pos_data'):
 	if treebank.startswith('UD') is True:
 		for size in sizes:
-			for arch in ['transformer']: #, 'transformer_tiny', 'lstm']:
-				for method in ['al', 'tokenfreq']:
+			for arch in ['crf']: #'transformer']: #, 'transformer_tiny', 'lstm']:
+				for method in ['al']:#, 'tokenfreq']:
 					iterations = int(max_size / int(select_interval))
 					with open('pbs/' + treebank + size + '_' + str(max_size) + '_' + arch + '_' + method + '.pbs', 'w') as f:
 						first_string = '''#!/bin/bash\n#SBATCH --job-name=''' + treebank + '_' + size + '_' + str(max_size) + '_' + arch + '    # Job name'
@@ -48,7 +47,7 @@ for treebank in treebanks_select:
 
 						for i in range(iterations):
 							select = str(i * int(select_interval))
-							if int(size) + int(select) <= max_size: # and int(select) >= 10000:
+							if int(size) + int(select) <= max_size and int(size) + int(select) > 20000: # and int(select) >= 10000:
 						
 								f.write('python scripts/fairseq.py /blue/liu.ying/unlabeled_pos/' + task + '_data/ ' + treebank + ' ' + size + ' ' + select_interval + ' ' + select + ' ' + arch + ' ' + method + '\n')
 								f.write('\n')
