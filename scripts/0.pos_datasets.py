@@ -32,11 +32,22 @@ def collect_data(file_handle):
 	with open(file_handle, encoding = 'utf-8') as f:
 		sent = conll_read_sentence(f)
 		while sent is not None:
-			words = [tok[1] for tok in sent]
+			words = []
+			for tok in sent:
+				temp_word = tok[1]
+				word = ''
+				if ' ' in temp_word:
+					word = ''.join(t for t in temp_word.split())
+				else:
+					word = temp_word
+				words.append(word)
 			POS_tags = [tok[3] for tok in sent]
-			if len(words) == 1 and POS_tags[0] == 'PUNCT':
-				pass
-			else:
+		#	if len(words) == 1 and POS_tags[0] == 'PUNCT':
+		#		pass
+		#	elif len(words) == 1 and (words[0].startswith('http') or words[0].startswith('Http')):
+		#		pass
+		#	else:
+			if [words, POS_tags] not in data:
 				data.append([words, POS_tags])
 			sent = conll_read_sentence(f)
 
@@ -74,6 +85,9 @@ def sort_train(train_data):
 
 	return sorted_train_data
 
+## Random sampling initial training set
+
+
 ## Generate initial training set to start with
 ## Along with the corresponding selection set
 ## One initial training sets (for now) for each size 
@@ -97,6 +111,7 @@ def generate_initial_train_select(sorted_train_data, initial_size, treebank):
 		select_set = sorted_train_data[i : ]
 		if select_set[0] == train_set[-1]:
 			print('Check your select and training set for overlap!' + '\n')
+			print(treebank, select_set[0], train_set[-1])
 
 	train_set_input_file = io.open('pos_data/' + treebank + '/train.' + str(initial_size) + '.input', 'w')
 	train_set_output_file = io.open('pos_data/' + treebank + '/train.' + str(initial_size) + '.output', 'w')
@@ -121,10 +136,8 @@ def generate_test(test_data, treebank):
 		test_set_input_file.write(' '.join(w for w in tok[0]) + '\n')
 		test_set_output_file.write(' '.join(w for w in tok[1]) + '\n')
 
-try:
+if not os.path.exists('pos_data'):
 	os.system('mkdir pos_data')
-except:
-	pass
 
 #exception_file = io.open('pos_exceptions.txt', 'w')
 
@@ -133,7 +146,7 @@ initial_size = int(sys.argv[1])
 #header = ['treebank', 'total_n_toks', 'train_n_toks', 'dev_n_toks', 'test_n_toks']
 #stats_file.write('\t'.join(w for w in header) + '\n')
 
-for treebank in os.listdir('ud-treebanks-v2.14/'):
+for treebank in os.listdir('pos_data/'): 
 	train_file = ''
 	dev_file = ''
 	test_file = ''
@@ -152,6 +165,7 @@ for treebank in os.listdir('ud-treebanks-v2.14/'):
 			print(treebank, 'EMPTY')
 			print('\n')
 		else:
+			print(treebank)
 			test_n_sents, test_n_toks = descriptive(test_data)
 			train_data = collect_data(train_file)
 			train_n_sents, train_n_toks = descriptive(train_data)
@@ -177,8 +191,9 @@ for treebank in os.listdir('ud-treebanks-v2.14/'):
 		# If you have more than 100K words, take 80% as training data, 10% (min 10K words) as dev data and 10% (min 10K words) as test data.
 		
 #		if test_n_toks >= 10000: # at least 10K tokens in the test set		
-					
-			os.system('mkdir pos_data/' + treebank)
+			if not os.path.exists('pos_data/' + treebank):	
+				os.system('mkdir pos_data/' + treebank)
+
 			sorted_train_data = sort_train(train_data) ### only using the training set (better justified?)
 			try:
 				actual_train_n_toks, actual_train_n_sents, actual_select_n_sents = generate_initial_train_select(sorted_train_data, initial_size, treebank)
@@ -186,8 +201,6 @@ for treebank in os.listdir('ud-treebanks-v2.14/'):
 				print(treebank, total_n_toks, train_n_toks, dev_n_toks, test_n_toks)
 
 			generate_test(test_data, treebank)
-
-			print('')
 
 #			try:
 #				sorted_train_data = sort_train(train_data + dev_data)
@@ -200,3 +213,19 @@ for treebank in os.listdir('ud-treebanks-v2.14/'):
 #			except:
 #				generate_initial_train_select(sorted_train_data, initial_size, treebank)
 
+'''
+['UD_Afrikaans-AfriBooms', 'UD_Hebrew-HTB', 'UD_Italian-ParTUT', 'UD_Faroese-FarPaHC', 'UD_Armenian-ArmTDP', 'UD_Basque-BDT',
+'UD_Slovenian-SSJ', 'UD_English-EWT', 'UD_Persian-PerDT', 'UD_German-HDT', 'UD_Manx-Cadhan', 'UD_Italian-MarkIT', 'UD_Western_Armenian-ArmTDP',
+'UD_Maltese-MUDT', 'UD_Erzya-JR', 'UD_French-Sequoia', 'UD_Slovenian-SST', 'UD_Swedish-LinES', 'UD_German-GSD', 'UD_Icelandic-GC',
+'UD_Lithuanian-HSE', 'UD_Greek-GDT', 'UD_Finnish-TDT', 'UD_English-ParTUT', 'UD_Pomak-Philotis', 'UD_Latin-ITTB', 'UD_English-LinES',
+'UD_Italian-VIT', 'UD_Italian-ParlaMint', 'UD_Galician-TreeGal', 'UD_Wolof-WTB', 'UD_Romanian-Nonstandard', 'UD_Swedish-Talbanken',
+'UD_English-GUM', 'UD_Polish-LFG', 'UD_Turkish-Tourism', 'UD_Irish-TwittIrish', 'UD_Naija-NSC', 'UD_Korean-GSD', 'UD_Portuguese-CINTIL',
+'UD_Croatian-SET', 'UD_Slovak-SNK', 'UD_Indonesian-GSD', 'UD_Romanian-RRT', 'UD_Turkish-BOUN', 'UD_Spanish-AnCora', 'UD_Maghrebi_Arabic_French-Arabizi',
+'UD_Greek-GUD', 'UD_Latin-Perseus', 'UD_Korean-Kaist', 'UD_Portuguese-Bosque', 'UD_Belarusian-HSE', 'UD_Turkish-Atis', 'UD_French-GSD', 'UD_Russian-SynTagRus',
+'UD_Norwegian-Nynorsk', 'UD_Welsh-CCG', 'UD_Telugu-MTG', 'UD_Polish-PDB', 'UD_Low_Saxon-LSDC', 'UD_Hindi-HDTB', 'UD_Italian-PoSTWITA', 'UD_Armenian-BSUT',
+'UD_North_Sami-Giella', 'UD_Icelandic-IcePaHC', 'UD_Japanese-GSDLUW', 'UD_Galician-CTG', 'UD_Italian-ISDT', 'UD_Hungarian-Szeged', 'UD_Norwegian-Bokmaal',
+'UD_Danish-DDT', 'UD_Turkish-IMST', 'UD_Czech-CAC', 'UD_Bulgarian-BTB', 'UD_English-Atis', 'UD_Irish-IDT', 'UD_Hebrew-IAHLTwiki', 'UD_Urdu-UDTB',
+'UD_Latvian-LVTB', 'UD_Ukrainian-IU', 'UD_Vietnamese-VTB', 'UD_Czech-PDT', 'UD_Russian-Poetry', 'UD_Icelandic-Modern', 'UD_Spanish-GSD', 'UD_Arabic-PADT',
+'UD_Latin-UDante', 'UD_Czech-CLTT', 'UD_Dutch-LassySmall', 'UD_Turkish-FrameNet', 'UD_Chinese-GSDSimp', 'UD_Estonian-EDT', 'UD_French-ParisStories',
+'UD_Indonesian-CSUI', 'UD_Czech-FicTree', 'UD_Turkish-Penn' 'UD_Lithuanian-ALKSNIS']: #
+'''

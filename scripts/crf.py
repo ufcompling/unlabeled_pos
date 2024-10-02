@@ -22,9 +22,6 @@ method = sys.argv[7]
 
 sub_datadir = datadir + treebank + '/' + size + '/' + method + '/' + select_interval + '/select' + select + '/'
 
-if not os.path.exists(sub_datadir + 'crf'):
-	os.system('mkdir ' + sub_datadir + 'crf')
-
 subprocess.run(['mkdir', '-p', datadir + treebank + '/' + size])
 subprocess.run(['mkdir', '-p', datadir + treebank + '/' + size + '/' + method])
 subprocess.run(['mkdir', '-p', datadir + treebank + '/' + size + '/' + method + '/' + select_interval])
@@ -50,8 +47,8 @@ elif select == 'all':
 else:
 	os.system('cat ' + previous_datadir + 'train.' + size + '.input ' + previous_datadir + '/increment.input >' + sub_datadir + 'train.' + size + '.input')
 	os.system('cat ' + previous_datadir + 'train.' + size + '.output ' + previous_datadir + '/increment.output >' + sub_datadir + 'train.' + size + '.output')
-	os.system('mv ' + previous_datadir + 'residual.input ' + sub_datadir + 'select.' + size + '.input')
-	os.system('mv ' + previous_datadir + 'residual.output ' + sub_datadir + 'select.' + size + '.output')
+	os.system('cp ' + previous_datadir + 'residual.input ' + sub_datadir + 'select.' + size + '.input')
+	os.system('cp ' + previous_datadir + 'residual.output ' + sub_datadir + 'select.' + size + '.output')
 
 ### Gathering data ###
 
@@ -151,7 +148,7 @@ def word2features(sent, i):
 
 # Convert each sentence to a list of features 
 def sent2features(sent):
-	print(sent)
+#	print(sent)
 	return [word2features(sent, i) for i in range(len(sent))]
 
 
@@ -200,7 +197,6 @@ def logResults(testgold, testpredict, confusionreport, modelname, tagset):
 	testgold = list(itertools.chain.from_iterable(testgold))
 	testpredict = list(itertools.chain.from_iterable(testpredict))
 	classreport = metrics.classification_report(testgold, testpredict, target_names = tagset) #zero_division=0.0)
-	print(classreport)
 	report = '\n\nClassification Report\n\n{}\n\nConfusion Matrix\n\n{}\n'.format(classreport, confusionreport)
 	with open(model_dir + 'classification_report.txt', 'w') as R:
 		R.write(time + report)
@@ -276,6 +272,15 @@ def mainCRF():
 		max_iterations = 100,
 		all_possible_transitions=True)
 
+	for i in range(len(train_X)):
+		if len(train_X[i]) != len(train_Y[i]):			
+			sent = []
+			for tok in train_X[i]:
+				sent.append(tok['word'])
+			print(' '.join(w) for w in sent)
+			print(train_input)
+			print(train_Y[i])
+			print('\n')
 	#train
 	crf.fit(train_X, train_Y)
 
@@ -327,6 +332,7 @@ def mainCRF():
 		f.write('N of training sents: ' + str(n_train_sents) + '\n')
 
 	print('eval file generated')
+	print(treebank, size, average_precision, average_recall, average_f1)
 
 	# predict on selection file
 	if select != 'all':
