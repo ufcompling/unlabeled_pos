@@ -1,0 +1,3 @@
+"0","Russian_Curves <-"
+"0","  Russian_Curves %>%"
+"0","  separate(Treebank, c(""Dependency"", ""Language"", ""Treebank"", ""Method"", ""extension""), ""[-_.]"")"

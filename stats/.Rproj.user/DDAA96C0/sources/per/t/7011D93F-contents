@@ -1,0 +1,435 @@
+---
+title: "Growth Curve Analysis"
+author: "Masoud Jasbi"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r packages, include=FALSE}
+library(tidyverse)
+library(brms)
+library(ggeffects)
+library(QurvE)
+```
+
+# Read Data
+
+Load data from the results folder for the AL and Random methods:
+
+```{r LoadData}
+al_50_pos_results <- read_delim("../results/new_50_pos_results.txt", delim = " ")
+random_50_pos_results <- read_delim("../results/50_pos_results_random.txt", delim = " ")
+```
+
+Limiting the analysis to only F1 scores and removing the Treebanks with no results.
+
+```{r}
+al_50_pos_results <-
+  al_50_pos_results %>%
+  filter(Metric=="f1", Treebank!="UD_German-HDT", Language!="Latin")
+
+random_50_pos_results <-
+  random_50_pos_results %>%
+  filter(Metric=="f1", Treebank!="UD_German-HDT", 
+         Treebank!="UD_Latin-ITTB", Treebank!="UD_Latin-Perseus", 
+         Treebank!="UD_Latin-UDante", Treebank!="UD_Latin-PROIEL", Treebank!="UD_Latin-LLCT")
+```
+
+# Statistical Models
+
+Parameters: 
+
+the upper asymptote $a$, 
+the growth rate $r$, 
+the inflection point $i$ along the x-axis
+Displacement along the y-axis $b$
+Displacement along the x-axis $i$
+$e$ is Euler's number): 
+
+$Y_{L} = a-(a-b)\times e^{-(cx)}$
+
+# Fitting All the Models
+
+Creating two empty data frames for storing model predictions and curves + derivatives `r Treebank_GrowthRates` and another empty data frame for model parameteres `r GrowthCurve_Models`.
+
+```{r}
+Treebank_GrowthRates <- data.frame()
+GrowthCurve_Models <- data.frame()
+```
+
+```{r}
+Data_Set <- al_50_pos_results
+Treebank_List <-unique(Data_Set$Treebank)
+```
+
+The loop below takes the data fro each Treebank, fits the growth curve model, stores the model parameters, stores the model predicitons as well as the first derivative in the empty data frames created above.
+
+```{r}
+for (Treebank_Label in Treebank_List){
+  
+Treebank_Data <-
+  Data_Set %>% 
+  filter(Treebank==Treebank_Label)
+
+Treebank_Model <- brm(
+  bf(Value  ~ upperAsymptote - (upperAsymptote -lowerAsymptote) * exp(-(growthRate*Select_size)^delta),
+     upperAsymptote ~ 1,
+     lowerAsymptote ~1,
+     growthRate ~ 1,
+     delta ~ 1,
+     nl = TRUE),
+  data = Treebank_Data,
+  prior = c(
+    prior(uniform(0, 1), nlpar = "upperAsymptote", lb = 0, ub = 1),
+    prior(uniform(0, 1), nlpar = "lowerAsymptote", lb = 0, ub = 1),
+    prior(uniform(0, 10), nlpar = "growthRate", lb = 0, ub = 10),
+    prior(uniform(0, 10), nlpar = "delta", lb = 0, ub = 10)
+  ),
+  file = paste("sample50/", Treebank_Label, "_model", sep=""),
+  iter = 4000)
+
+# Model Parameters Dataframe
+Treebank_Model_fixefs <- as.data.frame(fixef(Treebank_Model))
+Treebank_Model_fixefs$Treebank <- Treebank_Label
+GrowthCurve_Models <- rbind(GrowthCurve_Models, Treebank_Model_fixefs)
+
+# First Derivative Curves
+Treebank_Model_predictions <- as.data.frame(ggpredict(Treebank_Model))
+
+Treebank_Model_predictions$upperAsymptote <- fixef(Treebank_Model)[1]
+Treebank_Model_predictions$lowerAsymptote <- fixef(Treebank_Model)[2]
+Treebank_Model_predictions$growthRate <- fixef(Treebank_Model)[3]
+Treebank_Model_predictions$delta <- fixef(Treebank_Model)[4]
+
+Treebank_GrowthRate <-
+  Treebank_Model_predictions %>%
+  filter(Select_size.x!=0) %>%
+  mutate(Growth_Rate = (upperAsymptote - lowerAsymptote)*growthRate^delta*delta*Select_size.x^(delta-1)*exp(-(growthRate*Select_size.x)^delta))
+
+Treebank_GrowthRate$Treebank <- Treebank_Label
+
+Treebank_GrowthRates <- rbind(Treebank_GrowthRates, Treebank_GrowthRate)
+}
+```
+
+Now saving the dataframes for the AL model results and predictions.
+
+```{r}
+write.csv(Treebank_GrowthRates, "AL_50_GrowthRates.csv")
+write.csv(GrowthCurve_Models, "AL_50_GrowthCurveModels.csv")
+```
+
+
+```{r}
+write.csv(Treebank_GrowthRates, "AL_50_GrowthRates_random.csv")
+write.csv(GrowthCurve_Models, "AL_50_GrowthCurveModels_random.csv")
+```
+
+# Russian Treebanks
+
+```{r}
+Treebank_List <- list.files(path = "Russian", pattern = "*.rds")
+```
+
+```{r}
+Russian_Models <- data.frame()
+Russian_Curves <- data.frame()
+
+for (Treebank_Label in Treebank_List){
+  
+Treebank_Model <- readRDS(paste("Russian/", Treebank_Label, sep=""))
+
+# Model Parameters Dataframe
+Treebank_Model_fixefs <- as.data.frame(fixef(Treebank_Model))
+Treebank_Model_fixefs$Treebank <- Treebank_Label
+Russian_Models <- rbind(Russian_Models, Treebank_Model_fixefs)
+
+# First Derivative Curves
+Treebank_Model_predictions <- as.data.frame(ggpredict(Treebank_Model))
+
+Treebank_Model_predictions$upperAsymptote <- fixef(Treebank_Model)[1]
+Treebank_Model_predictions$lowerAsymptote <- fixef(Treebank_Model)[2]
+Treebank_Model_predictions$growthRate <- fixef(Treebank_Model)[3]
+Treebank_Model_predictions$delta <- fixef(Treebank_Model)[4]
+
+Treebank_Model_predictions <-
+  Treebank_Model_predictions %>%
+  filter(Select_size.x!=0) %>%
+  mutate(Growth_Rate = (upperAsymptote - lowerAsymptote)*growthRate^delta*delta*Select_size.x^(delta-1)*exp(-(growthRate*Select_size.x)^delta))
+
+Treebank_Model_predictions$Treebank <- Treebank_Label
+
+Russian_Curves <- rbind(Russian_Curves, Treebank_Model_predictions)
+}
+```
+
+```{r}
+Russian_Models <-
+  Russian_Models %>%
+  rownames_to_column("Parameter") %>%
+  separate(Parameter, c("Parameter","Whatever"), "_") %>%
+  select(-Whatever) %>%
+  separate(Treebank, c("Dependency", "Language", "Treebank", "Method", "extension"), "[-_.]")
+```
+
+```{r}
+Russian_Curves <-
+  Russian_Curves %>%
+  separate(Treebank, c("Dependency", "Language", "Treebank", "Method", "extension"), "[-_.]")
+```
+
+## Growth Curves
+
+```{r}
+Russian_Curves %>%
+  ggplot(aes(Select_size.x, Select_size.predicted, color=Method)) +
+  geom_line()+
+  geom_ribbon(aes(ymin = Select_size.conf.low, ymax = Select_size.conf.high), alpha=0.3, linetype=0) + 
+  theme_linedraw() + facet_wrap("Treebank")
+```
+
+```{r}
+Russian_Models$Parameter <- recode_factor(Russian_Models$Parameter, 
+                                          upperAsymptote = "Upper Asymptote", growthRate = "Growth Rate")
+
+Russian_Models %>%
+  filter(Parameter!="delta", Parameter!="lowerAsymptote") %>%
+  ggplot(aes(Treebank,Estimate, color=Method)) + 
+  geom_point(size=2) +
+  geom_linerange(aes(ymin = Q2.5, ymax = Q97.5)) +
+  facet_wrap("Parameter", scales = "free_y") + theme_linedraw() +
+  theme(axis.text.x = element_text(angle = 75, hjust = 1), legend.position = "inside", legend.position.inside = c(0.9,0.8), text = element_text(size = 16)) 
+  
+```
+```{r}
+Russian_Models %>%
+  filter(Parameter == "Growth Rate" | Parameter == "Upper Asymptote")
+```
+
+
+## Derivatives
+
+```{r}
+Russian_Curves %>%
+  ggplot(aes(Select_size.x, Growth_Rate, color=Method)) +
+  geom_line() + facet_wrap("Treebank") + 
+  theme_linedraw()
+```
+
+# Reloading All Models
+
+## Random Method
+
+```{r}
+Treebank_List_Random <- list.files(path = "sample50random", pattern = "*.rds")
+
+All_Models_Random <- data.frame()
+All_Curves_Random <- data.frame()
+```
+
+```{r}
+for (Treebank_Label in Treebank_List_Random){
+  
+Treebank_Model <- readRDS(paste("sample50random/", Treebank_Label, sep=""))
+
+# Model Parameters Dataframe
+Treebank_Model_fixefs <- as.data.frame(fixef(Treebank_Model))
+Treebank_Model_fixefs$Treebank <- Treebank_Label
+All_Models_Random <- rbind(All_Models_Random, Treebank_Model_fixefs)
+
+# First Derivative Curves
+Treebank_Model_predictions <- as.data.frame(ggpredict(Treebank_Model))
+
+Treebank_Model_predictions$upperAsymptote <- fixef(Treebank_Model)[1]
+Treebank_Model_predictions$lowerAsymptote <- fixef(Treebank_Model)[2]
+Treebank_Model_predictions$growthRate <- fixef(Treebank_Model)[3]
+Treebank_Model_predictions$delta <- fixef(Treebank_Model)[4]
+
+Treebank_Model_predictions <-
+  Treebank_Model_predictions %>%
+  filter(Select_size.x!=0) %>%
+  mutate(Growth_Rate = (upperAsymptote - lowerAsymptote)*growthRate^delta*delta*Select_size.x^(delta-1)*exp(-(growthRate*Select_size.x)^delta))
+
+Treebank_Model_predictions$Treebank <- Treebank_Label
+
+All_Curves_Random <- rbind(All_Curves_Random, Treebank_Model_predictions)
+}
+
+All_Models_Random$Method <- "Random"
+All_Curves_Random$Method <- "Random"
+```
+
+```{r}
+write.csv(All_Models_Random, "All_Models_Random")
+write.csv(All_Curves_Random, "All_Curves_Random")
+```
+
+## AL Method
+
+```{r}
+Treebank_List_AL <- list.files(path = "sample50AL", pattern = "*.rds")
+
+All_Models_AL <- data.frame()
+All_Curves_AL <- data.frame()
+```
+
+```{r}
+for (Treebank_Label in Treebank_List_AL){
+  
+Treebank_Model <- readRDS(paste("sample50AL/", Treebank_Label, sep=""))
+
+# Model Parameters Dataframe
+Treebank_Model_fixefs <- as.data.frame(fixef(Treebank_Model))
+Treebank_Model_fixefs$Treebank <- Treebank_Label
+All_Models_AL <- rbind(All_Models_AL, Treebank_Model_fixefs)
+
+# First Derivative Curves
+Treebank_Model_predictions <- as.data.frame(ggpredict(Treebank_Model))
+
+Treebank_Model_predictions$upperAsymptote <- fixef(Treebank_Model)[1]
+Treebank_Model_predictions$lowerAsymptote <- fixef(Treebank_Model)[2]
+Treebank_Model_predictions$growthRate <- fixef(Treebank_Model)[3]
+Treebank_Model_predictions$delta <- fixef(Treebank_Model)[4]
+
+Treebank_Model_predictions <-
+  Treebank_Model_predictions %>%
+  filter(Select_size.x!=0) %>%
+  mutate(Growth_Rate = (upperAsymptote - lowerAsymptote)*growthRate^delta*delta*Select_size.x^(delta-1)*exp(-(growthRate*Select_size.x)^delta))
+
+Treebank_Model_predictions$Treebank <- Treebank_Label
+
+All_Curves_AL <- rbind(All_Curves_AL, Treebank_Model_predictions)
+}
+
+All_Models_AL$Method <- "AL"
+All_Curves_AL$Method <- "AL"
+```
+
+```{r}
+write.csv(All_Models_AL, "All_Models_AL")
+write.csv(All_Curves_AL, "All_Curves_AL")
+```
+
+```{r}
+All_Models <- rbind(All_Models_AL, All_Models_Random)
+All_Curves <- rbind(All_Curves_AL, All_Curves_Random)
+```
+
+```{r}
+write.csv(All_Models, "All_Models")
+write.csv(All_Curves, "All_Curves")
+```
+
+## Cleanup
+
+```{r}
+All_Models <- read.csv("All_Models")
+All_Curves <- read.csv("All_Curves")
+```
+
+
+```{r}
+All_Models <-
+  All_Models %>%
+  rename(Parameter="X") %>%
+  separate(Parameter, c("Parameter","Whatever"), "_") %>%
+  select(-Whatever)
+  
+All_Models$Treebank <-str_remove(All_Models$Treebank, "_model.rds")
+All_Models$Treebank <-str_remove(All_Models$Treebank, "UD_")
+```
+
+```{r}
+All_Curves <-
+  All_Curves %>%
+  separate(Treebank, c("Dependency", "Treebank", "model", "extension"), "[-_.]")
+```
+
+## Growth Curves
+
+```{r}
+All_Curves %>%
+  ggplot(aes(Select_size.x, Select_size.predicted, color=Method)) +
+  geom_line()+
+  geom_ribbon(aes(ymin = Select_size.conf.low, ymax = Select_size.conf.high), alpha=0.3, linetype=0) + 
+  theme_linedraw() + facet_wrap(Treebank)
+```
+
+```{r}
+All_Models$Parameter <- recode_factor(All_Models$Parameter, 
+                                          upperAsymptote = "Upper Asymptote", growthRate = "Growth Rate")
+
+All_Models %>%
+  filter(Parameter=="Growth Rate",
+         Treebank!="Telugu-MTG", Treebank!="Chinese-GSDSimp", Treebank!="Lithuanian-HSE") %>%
+  ggplot(aes(Treebank,Estimate, color=Method)) + 
+  geom_point() +
+  geom_linerange(aes(ymin = Q2.5, ymax = Q97.5)) +
+  facet_wrap("Parameter", scales = "free_y") + theme_linedraw() +
+  theme(axis.text.x = element_text(angle = 75, hjust = 1), legend.position = "inside", legend.position.inside = c(0.95,0.8)) 
+```
+
+```{r}
+All_Models %>%
+  filter(Parameter=="Upper Asymptote", Treebank!="Telugu-MTG", Treebank!="Chinese-GSDSimp", Treebank!="Lithuanian-HSE") %>%
+  ggplot(aes(Treebank,Estimate, color=Method)) + 
+  geom_point() +
+  geom_linerange(aes(ymin = Q2.5, ymax = Q97.5)) +
+  facet_wrap("Parameter", scales = "free_y") + theme_linedraw() +
+  theme(axis.text.x = element_text(angle = 75, hjust = 1), legend.position = "inside", legend.position.inside = c(0.08,0.2)) 
+```
+
+```{r}
+All_Models %>%
+  filter(Parameter=="Upper Asymptote", Treebank!="Telugu-MTG", Treebank!="Chinese-GSDSimp", Treebank!="Lithuanian-HSE") %>%
+  arrange(Estimate, decreasing=T)
+```
+
+```{r}
+All_Models %>%
+  filter(Parameter=="Growth Rate") %>%
+  ggplot(aes(Parameter,Estimate, color=Method)) + 
+  geom_point() +
+  geom_linerange(aes(ymin = Q2.5, ymax = Q97.5)) +
+  facet_wrap(Parameter~Treebank, scales = "free_y") + theme_linedraw()
+```
+
+
+```{r}
+All_Models_Average <-  
+  All_Models %>%
+  filter(Parameter=="Upper Asymptote" | Parameter=="Growth Rate") %>%
+  group_by(Method, Parameter) %>%
+  summarise(Average_F1 = mean(Estimate), Average_Lower = mean(Q2.5), Average_Higher = mean(Q97.5))
+```
+
+```{r}
+All_Models_Average %>%
+  ggplot(aes(Method, Average_F1, color=Method)) +
+  geom_point() +
+  geom_linerange(aes(ymin=Average_Lower, ymax=Average_Higher)) +
+  facet_wrap("Parameter", scales = "free_y") +
+  theme_linedraw()
+```
+
+# Refitting the Models that Failed 
+
+```{r}
+Individual_Model <- brm(
+  bf(Value  ~ upperAsymptote - (upperAsymptote -lowerAsymptote) * exp(-(growthRate*Select_size)^delta),
+     upperAsymptote ~ 1,
+     lowerAsymptote ~1,
+     growthRate ~ 1,
+     delta ~ 1,
+     nl = TRUE),
+  data = filter(random_50_pos_results,Treebank=="UD_Telugu-MTG"),
+  prior = c(
+    prior(uniform(0, 1), nlpar = "upperAsymptote", lb = 0, ub = 1),
+    prior(uniform(0, 1), nlpar = "lowerAsymptote", lb = 0, ub = 1),
+    prior(uniform(0, 10), nlpar = "growthRate", lb = 0, ub = 10),
+    prior(uniform(0, 10), nlpar = "delta", lb = 0, ub = 10)
+  ),
+  file = "UD_Telugu-MTG_model",
+  iter = 30000)
+```
+

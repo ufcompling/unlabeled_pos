@@ -1,0 +1,5 @@
+"0","Treebank_GrowthRates %>%"
+"0","  filter(str_detect(Treebank, ""Russian"")) %>%"
+"0","  ggplot(aes(Select_size.x, Growth_Rate)) +"
+"0","  geom_line() + facet_wrap(""Treebank"") + "
+"0","  theme_linedraw()"

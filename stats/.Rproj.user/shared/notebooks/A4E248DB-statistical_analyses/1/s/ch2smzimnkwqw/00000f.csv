@@ -1,0 +1,3 @@
+"0","All_Models %>%"
+"0","  filter(Parameter==""Upper Asymptote"", Treebank!=""Telugu-MTG"", Treebank!=""Chinese-GSDSimp"", Treebank!=""Lithuanian-HSE"") %>%"
+"0","  arrange(Estimate, decreasing=T)"

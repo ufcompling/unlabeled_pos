@@ -1,0 +1,7 @@
+"0","All_Models %>%"
+"0","  filter(Parameter==""Upper Asymptote"", Treebank!=""Telugu-MTG"", Treebank!=""Chinese-GSDSimp"", Treebank!=""Lithuanian-HSE"") %>%"
+"0","  ggplot(aes(Treebank,Estimate, color=Method)) + "
+"0","  geom_point() +"
+"0","  geom_linerange(aes(ymin = Q2.5, ymax = Q97.5)) +"
+"0","  facet_wrap(""Parameter"", scales = ""free_y"") + theme_linedraw() +"
+"0","  theme(axis.text.x = element_text(angle = 75, hjust = 1), legend.position = ""inside"", legend.position.inside = c(0.08,0.2)) "

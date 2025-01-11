@@ -1,0 +1,29 @@
+"0","al_50_pos_results <- read_delim(""../results/new_50_pos_results.txt"", delim = "" "")"
+"2","Warning:"
+"2"," [38;5;252mOne or more parsing issues, call `problems()` on your data frame for details, e.g.:
+  dat <- vroom(...)
+  problems(dat)[39m
+"
+"1","[1mRows: [22m[34m87987[39m [1mColumns: [22m[34m11[39m
+"
+"1","[36m──[39m [1mColumn specification[22m [36m──────────────────────────────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "" ""
+[31mchr[39m (6): Treebank, Task, Model, Metric, Language, Language_Family
+[32mdbl[39m (5): Size, Select_interval, Select_size, Total, Value
+"
+"1","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message.
+"
+"0","random_50_pos_results <- read_delim(""../results/50_pos_results_random.txt"", delim = "" "")"
+"1","[1mRows: [22m[34m84090[39m [1mColumns: [22m[34m9[39m
+"
+"1","[36m──[39m [1mColumn specification[22m [36m──────────────────────────────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "" ""
+[31mchr[39m (4): Treebank, Task, Model, Metric
+[32mdbl[39m (5): Size, Select_interval, Select_size, Total, Value
+"
+"1","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message.
+"

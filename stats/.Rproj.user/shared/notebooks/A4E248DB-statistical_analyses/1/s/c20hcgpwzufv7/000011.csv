@@ -1,0 +1,6 @@
+"0","Russian_Models <-"
+"0","  Russian_Models %>%"
+"0","  rownames_to_column(""Parameter"") %>%"
+"0","  separate(Parameter, c(""Parameter"",""Whatever""), ""_"") %>%"
+"0","  select(-Whatever) %>%"
+"0","  separate(Treebank, c(""Dependency"", ""Language"", ""Treebank"", ""Method"", ""extension""), ""[-_.]"")"

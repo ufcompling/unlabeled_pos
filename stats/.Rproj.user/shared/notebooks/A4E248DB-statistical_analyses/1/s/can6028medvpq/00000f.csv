@@ -1,0 +1,5 @@
+"0","Russian_Curves %>%"
+"0","  ggplot(aes(Select_size.x, Select_size.predicted, color=Method)) +"
+"0","  geom_line()+"
+"0","  geom_ribbon(aes(ymin = Select_size.conf.low, ymax = Select_size.conf.high), alpha=0.3, linetype=0) + "
+"0","  theme_linedraw() + facet_wrap(""Treebank"")"
