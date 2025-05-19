@@ -1,7 +1,8 @@
 import pandas as pd
 import sys
 
-result_file = 'results/' + sys.argv[1]
+result_file = sys.argv[1]
+filename = result_file.split('/')[-1]
 
 descriptive_stats = pd.read_csv("results/ud_overall_stats.csv")
 treebanks = descriptive_stats['treebank'].tolist()
@@ -31,6 +32,6 @@ with open(result_file) as f:
 			except:
 				print(treebank)
 
-with open('results/new_' + sys.argv[1], 'w') as f:
+with open('results/finalized_' + filename, 'w') as f:
 	for tok in updated_data:
 		f.write(' '.join(str(w) for w in tok) + '\n')
