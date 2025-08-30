@@ -3,3 +3,13 @@ pos_data/
 stats/sample50AL
 Russian/
 stats/sample50random/
+.Rproj.user
+stats/.RData
+results/finalized_1000_pos_results.txt
+stats/.Rhistory
+
+stats/.RDataTmp
+
+stats/.Rproj.user*
+
+stats/oldModels
