@@ -130,7 +130,6 @@ def generate_train(original_train_data, initial_size, treebank, max_size, select
 			train_set_input_file.close()
 			train_set_output_file.close()
 			
-			# Write selection file for select0 for active learning
 			if select_size == 0:
 				print(len(train_set))
 				print('Writing selection file for select0; Number of sentences: ', len(train_data))				
@@ -148,7 +147,6 @@ def generate_train(original_train_data, initial_size, treebank, max_size, select
 	for i in range(n):
 		os.system('cp pos_data/' + treebank + '/' + str(initial_size) + '/' + str(i) + '/random/' + str(select_interval) + '/select0/train.' + str(initial_size) + '.input' + ' pos_data/' + treebank + '/' + str(initial_size) + '/' + str(i) + '/al/' + str(select_interval) + '/select0/')
 		os.system('cp pos_data/' + treebank + '/' + str(initial_size) + '/' + str(i) + '/random/' + str(select_interval) + '/select0/train.' + str(initial_size) + '.output' + ' pos_data/' + treebank + '/' + str(initial_size) + '/' + str(i) + '/al/' + str(select_interval) + '/select0/')
-		print('cp pos_data/' + treebank + '/' + str(initial_size) + '/' + str(i) + '/random/' + str(select_interval) + '/select0/train.' + str(initial_size) + '.input' + ' pos_data/' + treebank + '/' + str(initial_size) + '/' + str(i) + '/al/' + str(select_interval) + '/select0/')
 
 # Generate full test data to text files
 def generate_test(test_data, treebank):
@@ -167,17 +165,17 @@ initial_size = int(sys.argv[1])
 
 select_interval = 500 #sys.argv[2]
 
-for treebank in os.listdir('ud-treebanks-v2.14/'):
+for treebank in os.listdir('/blue/liu.ying/unlabeled_pos/pos_data/'):
 	train_file = ''
 	dev_file = ''
 	test_file = ''
-	for file in os.listdir('ud-treebanks-v2.14/' + treebank + '/'):
+	for file in os.listdir('/blue/liu.ying/unlabeled_pos/ud-treebanks-v2.14/' + treebank + '/'):
 		if 'train.conllu' in file:
-			train_file = 'ud-treebanks-v2.14/' + treebank + '/' + file
+			train_file = '/blue/liu.ying/unlabeled_pos/ud-treebanks-v2.14/' + treebank + '/' + file
 		if 'dev.conllu' in file:
-			dev_file = 'ud-treebanks-v2.14/' + treebank + '/' + file
+			dev_file = '/blue/liu.ying/unlabeled_pos/ud-treebanks-v2.14/' + treebank + '/' + file
 		if 'test.conllu' in file:
-			test_file = 'ud-treebanks-v2.14/' + treebank + '/' + file
+			test_file = '/blue/liu.ying/unlabeled_pos/ud-treebanks-v2.14/' + treebank + '/' + file
 
 	if train_file != '' and test_file != '':
 		### Generating gold-standard test set
@@ -215,3 +213,4 @@ for treebank in os.listdir('ud-treebanks-v2.14/'):
 				max_size = 100000
 		
 			generate_train(train_data, initial_size, treebank, max_size, select_interval)
+

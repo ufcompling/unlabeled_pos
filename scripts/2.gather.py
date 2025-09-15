@@ -170,19 +170,26 @@ def tag_syntax_dist(train_bigram_list, uni_tag):
 
 	return word_entropy(tag_syntax_env)
 
+os.makedirs('pos_results/', exist_ok = True)
 
 for size in sizes:
-	outfile = open(size + '_' + task + '_results.txt', 'w')
-	header = ['Treebank', 'Task', 'Size', 'Select_interval', 'Select_size', 'Method', 'Total', 'Model', 'Metric', 'Value', 'Seed']
-	outfile.write(' '.join(tok for tok in header) + '\n')
-
-	individual_outfile = open(size + '_' + task + '_results_inidvidual_tag.txt', 'w')
-	individual_header = ['Treebank', 'Task', 'Size', 'Select_interval', 'Select_size', 'Method', 'Total', 'Tag', 'Model', 'Metric', 'Value', 'Support', 'Tag_Prob', 'Tag_word_entropy', 'Tag_syntax_entropy', 'Seed']
-	individual_outfile.write(' '.join(tok for tok in individual_header) + '\n')
-
 	for treebank in os.listdir('pos_data/'):
-		if os.path.exists(datadir + treebank): # and 'UD_Afrikaans-AfriBooms' in treebank:
-			print(treebank)
+		if os.path.exists(datadir + treebank):
+			treebank_outfile_path = 'pos_results/' + treebank + '_' + size + '_' + task + '_results_new.txt'
+			treebank_outfile = None
+			if not os.path.exists(treebank_outfile_path) or os.path.getsize(treebank_outfile_path) == 0:
+				print(treebank)
+				treebank_outfile = open('pos_results/' + treebank + '_' + size + '_' + task + '_results_new.txt', 'w')
+				treebank_header = ['Treebank', 'Task', 'Size', 'Select_interval', 'Select_size', 'Method', 'Total', 'Model', 'Metric', 'Value', 'Seed']
+				treebank_outfile.write(' '.join(tok for tok in treebank_header) + '\n')
+
+			treebank_individual_outfile_path = 'pos_results/' + treebank + '_' + size + '_' + task + '_results_inidvidual_tag_new.txt'
+			treebank_individual_outfile = None
+			if not os.path.exists(treebank_individual_outfile_path) or os.path.getsize(treebank_individual_outfile_path) == 0:
+				treebank_individual_outfile = open('pos_results/' + treebank + '_' + size + '_' + task + '_results_inidvidual_tag_new.txt', 'w')
+				treebank_individual_header = ['Treebank', 'Task', 'Size', 'Select_interval', 'Select_size', 'Method', 'Total', 'Tag', 'Model', 'Metric', 'Value', 'Support', 'Tag_Prob', 'Tag_word_entropy', 'Tag_syntax_entropy', 'Seed']
+				treebank_individual_outfile.write(' '.join(tok for tok in treebank_individual_header) + '\n')
+
 			train_file = ''
 			for file in os.listdir('/blue/liu.ying/unlabeled_pos/ud-treebanks-v2.14/' + treebank + '/'):
 				if 'train.conllu' in file:
@@ -198,40 +205,32 @@ for size in sizes:
 				max_size = 100000
 
 			if size in os.listdir(datadir + treebank):
-				for arch in ['crf']: #, 'transformer_tiny', 'lstm']:
-					for z in range(1):
-						for method in ['al', 'random']:
-							iterations = int(max_size / int(select_interval))
-							for i in range(iterations):
+				for arch in ['crf']: #, 'transformer_tiny', 'lstm']:					
+					for method in ['al', 'random']:
+						iterations = int(max_size / int(select_interval))
+						for i in range(iterations):
+							total_list = []
+							precision_scores = []
+							recall_scores = []
+							f1_scores = []
+							for z in range(3):
 								select = str(i * int(select_interval))
 								train_input = datadir + treebank + '/' + size + '/' + str(z) + '/' + method + '/' + select_interval + '/select' + str(select) + '/train.' + size + '.input'
 								kl_file = datadir + treebank + '/' + size + '/' + str(z) + '/' + method + '/' + select_interval + '/select' + str(select) + '/' + arch + '/kl.txt'
 								classification_report = datadir + treebank + '/' + size + '/' + str(z) + '/' + method + '/' + select_interval + '/select' + str(select) + '/' + arch + '/classification_report.txt'
-							
-								if os.path.exists(train_input) is True and os.path.exists(kl_file) is True and os.path.exists(classification_report) is True and int(size) + int(select) <= max_size:
+								
+
+								if treebank_outfile is not None and treebank_individual_outfile is not None and os.path.exists(train_input) is True and os.path.exists(kl_file) is True and os.path.exists(classification_report) is True and int(size) + int(select) <= max_size:
 									total = 0
+									select = str(i * int(select_interval))
+									train_input = datadir + treebank + '/' + size + '/' + str(z) + '/' + method + '/' + select_interval + '/select' + str(select) + '/train.' + size + '.input'									
 									with open(train_input) as f:
 										for train_line in f:
 											toks = train_line.strip().split()
 											total += len(toks)
-
-									precision_scores = []
-									recall_scores = []
-									f1_scores = []
+									total_list.append(total)
 									select = str(i * int(select_interval))
 									
-									train_tags = []
-									train_bigrams = []
-									train_output = datadir + treebank + '/' + size + '/' + str(z) + '/' + method + '/' + select_interval + '/select' + str(select) + '/train.' + size + '.output'
-									with open(train_output) as f:
-										for train_line in f:
-											toks = train_line.strip().split()
-											train_tags += toks
-											bigrams = list(nltk.bigrams(toks))
-											train_bigrams += bigrams
-
-									train_tag_stats	= tag_stats(train_tags)
-									train_tag_word_dist = tag_word_dist(train_input, train_output)
 
 									evaluation_file = datadir + treebank + '/' + size + '/' + str(z) + '/' + method + '/' + select_interval + '/select' + str(select) + '/' + arch + '/eval.txt'
 									if int(size) + int(select) <= max_size and os.path.exists(evaluation_file):
@@ -252,114 +251,19 @@ for size in sizes:
 										recall_scores.append(float(recall))
 										f1_scores.append(float(f1))
 
-										info = [treebank, task, size, select_interval, select, method, total, arch, 'precision', precision, str(z)]
-										outfile.write(' '.join(str(tok) for tok in info) + '\n')
-										info = [treebank, task, size, select_interval, select, method, total, arch, 'recall', recall, str(z)]
-										outfile.write(' '.join(str(tok) for tok in info) + '\n')
-										info = [treebank, task, size, select_interval, select, method, total, arch, 'f1', f1, str(z)]
-										outfile.write(' '.join(str(tok) for tok in info) + '\n')
+							if len(precision_scores) == 3:
+							### Adding average evaluation metrics
+								ave_info = [treebank, task, size, select_interval, select, method, int(np.mean(total)), arch, 'precision', np.mean(precision_scores), 'average']
+								treebank_outfile.write(' '.join(str(tok) for tok in ave_info) + '\n')
+								ave_info = [treebank, task, size, select_interval, select, method, int(np.mean(total)), arch, 'recall', np.mean(precision_scores), 'average']
+								treebank_outfile.write(' '.join(str(tok) for tok in ave_info) + '\n')
+								ave_info = [treebank, task, size, select_interval, select, method, int(np.mean(total)), arch, 'f1', np.mean(precision_scores), 'average']
+								treebank_outfile.write(' '.join(str(tok) for tok in ave_info) + '\n')
 
-									with open(kl_file) as f:
-										for line in f:
-											if line.startswith('tag KL: '):
-												toks = line.strip().split()
-												kl = toks[-1]
-												tag = 'kl'
-												info = [treebank, task, size, select_interval, select, method, total, arch, 'kl', kl]
-												outfile.write(' '.join(str(tok) for tok in info) + '\n')
-									
-									if int(size) + int(select) <= max_size and os.path.exists(classification_report):
-										with open(classification_report) as f:
-											for line in f:
-												toks = line.strip().split()							
-												if len(toks) == 5 and toks[0] in ud_tags:
-													tag = toks[0]
-													precision = toks[1]
-													recall = toks[2]
-													f1 = toks[3]
-													support = toks[-1]
-
-													tag_syntax_entropy = tag_syntax_dist(train_bigrams, tag)
-
-									#		tag_syntax_env = []
-									#		for bigram in train_bigrams:
-									#			if tag in bigram:
-									#				if bigram.count(tag) == 1:
-									#					for gram in bigram:
-									#						if gram != tag:
-									#							tag_syntax_env.append(gram)
-									#				else:
-									#					tag_syntax_env.append(tag)
-
-									#		tag_syntax_entropy = word_entropy(tag_syntax_env)
-
-													info = [treebank, task, size, select_interval, select, method, total, tag, arch, 'precision', precision, support, train_tag_stats[tag][-1], train_tag_word_dist[tag], tag_syntax_entropy, str(z)]
-													individual_outfile.write(' '.join(str(tok) for tok in info) + '\n')
-													info = [treebank, task, size, select_interval, select, method, total, tag, arch, 'recall', recall, support, train_tag_stats[tag][-1], train_tag_word_dist[tag], tag_syntax_entropy, str(z)]
-													individual_outfile.write(' '.join(str(tok) for tok in info) + '\n')
-													info = [treebank, task, size, select_interval, select, method, total, tag, arch, 'f1', f1, support, train_tag_stats[tag][-1], train_tag_word_dist[tag], tag_syntax_entropy, str(z)]
-													individual_outfile.write(' '.join(str(tok) for tok in info) + '\n')
-
-									### Adding average evaluation metrics
-									ave_info = [treebank, task, size, select_interval, select, method, total, arch, 'precision', np.mean(precision_scores), 'average']
-									outfile.write(' '.join(str(tok) for tok in ave_info) + '\n')
-									ave_info = [treebank, task, size, select_interval, select, method, total, arch, 'recall', np.mean(precision_scores), 'average']
-									outfile.write(' '.join(str(tok) for tok in ave_info) + '\n')
-									ave_info = [treebank, task, size, select_interval, select, method, total, arch, 'f1', np.mean(precision_scores), 'average']
-									outfile.write(' '.join(str(tok) for tok in ave_info) + '\n')
-
-									std_info = [treebank, task, size, select_interval, select, method, total, arch, 'precision', np.std(precision_scores), 'std']
-									outfile.write(' '.join(str(tok) for tok in std_info) + '\n')
-									std_info = [treebank, task, size, select_interval, select, method, total, arch, 'recall', np.std(precision_scores), 'std']
-									outfile.write(' '.join(str(tok) for tok in std_info) + '\n')
-									std_info = [treebank, task, size, select_interval, select, method, total, arch, 'f1', np.std(precision_scores), 'std']
-									outfile.write(' '.join(str(tok) for tok in std_info) + '\n')
-
-'''
-
-							if not (int(size) + int(select) <= max_size and os.path.exists(evaluation_file)):
-								select_file = datadir + treebank + '/' + size + '/' + method + '/' + select_interval + '/select' + str(select) + '/select.' + size + '.input'
-								if not os.path.exists(select_file):
-									print(select_file)			
-									previous_select_file = datadir + treebank + '/' + size + '/' + method + '/' + select_interval + '/select' + str(int(select) - 250) + '/select.' + size + '.input'
-									if os.path.exists(previous_select_file):
-										select_total = 0
-										with open(previous_select_file) as f:
-											for line in f:
-												toks = line.strip().split()
-												select_total += len(toks)
-										if not (total >= max_size or select_total < 250):
-											print(evaluation_file)
-								else:
-									if int(select) <= 500:
-										print(evaluation_file)
-
-'''
-
-'''
-select = 'all'
-evaluation_file = datadir + treebank + '/' + size + '/' + method + '/' + select_interval + '/select' + str(select) + '/' + arch + '/eval.txt'
-
-if os.path.exists(evaluation_file):
-	precision = ''
-	recall = ''
-	f1 = ''
-	with open(evaluation_file) as f:
-		for line in f:
-			toks = line.strip().split()
-			if line.startswith('Precision'):
-				precision = toks[1]
-			if line.startswith('Recall'):
-				recall = toks[1]
-			if line.startswith('F1'):
-				f1 = toks[1]
-
-	info = [treebank, task, size, select_interval, select, arch, 'precision', precision]
-	outfile.write(' '.join(str(tok) for tok in info) + '\n')
-	info = [treebank, task, size, select_interval, select, arch, 'recall', recall]
-	outfile.write(' '.join(str(tok) for tok in info) + '\n')
-	info = [treebank, task, size, select_interval, select, arch, 'f1', f1]
-	outfile.write(' '.join(str(tok) for tok in info) + '\n')
-'''
-
+								std_info = [treebank, task, size, select_interval, select, method, int(np.mean(total)), arch, 'precision', np.std(precision_scores), 'std']
+								treebank_outfile.write(' '.join(str(tok) for tok in std_info) + '\n')
+								std_info = [treebank, task, size, select_interval, select, method, int(np.mean(total)), arch, 'recall', np.std(precision_scores), 'std']
+								treebank_outfile.write(' '.join(str(tok) for tok in std_info) + '\n')
+								std_info = [treebank, task, size, select_interval, select, method, int(np.mean(total)), arch, 'f1', np.std(precision_scores), 'std']
+								treebank_outfile.write(' '.join(str(tok) for tok in std_info) + '\n')
 
